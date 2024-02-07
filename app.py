@@ -1,17 +1,34 @@
 import streamlit as st
 import requests
 from geopy.geocoders import Nominatim
-
-# Initialize the geolocator
-geolocator = Nominatim(user_agent="geoapiExercises")
+import pandas as pd
+import pydeck as pdk
+import pandas as pd
+import streamlit as st
 
 def geocode_address(address):
     """Convert address to latitude and longitude."""
-    location = geolocator.geocode(address)
-    if location:
-        return location.latitude, location.longitude
+    url = 'https://nominatim.openstreetmap.org/search'
+
+    #Parameters
+    params = {
+        'q': address,
+        'format': 'json',
+    }
+    # Send the GET request
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            # Extract latitude and longitude
+            latitude = data[0]['lat']
+            longitude = data[0]['lon']
+            print("Location found ✅ " + address + " : " + latitude + " " + longitude)
+            return latitude, longitude
+        else:
+            return "No results found", "No results found"
     else:
-        return None, None
+        return "Request failed", "Request failed"
 
 def call_prediction_api(data):
     """Placeholder function to call the prediction API."""
@@ -32,38 +49,30 @@ with st.form("house_price_form"):
                                   min_value=1, max_value=10000, value = 100, step=1)
     address = st.text_input("Enter an address (or leave blank to select on map)")
 
-    #load map with default view
-    start_latitude, start_longitude = 48.8566, 2.3522 # Paris
+    #load map - default view is not possible with st.map
     map_location = st.empty()  # Placeholder for the map
     submitted = st.form_submit_button("Predict Price")
-    #integrate default map
-    #map_location = st.map(data=[[start_latitude, start_longitude]], zoom=11)
 
-    if submitted:
-        if address:  # If the user entered an address, geocode it
-            latitude, longitude = geocode_address(address)
-            if latitude and longitude:
-                map_location.map(data=[[latitude, longitude]], zoom=11)
-            else:
-                st.error("Could not geocode the address. Please try again or select a point on the map.")
-        else:
-            # If no address is entered, use the map to get latitude and longitude
-            st.error("Please enter an address or select a location on the map.")
+if submitted:
+    latitude, longitude = geocode_address(address)
+    # Convert latitude and longitude to float
+    latitude = float(latitude)
+    longitude = float(longitude)
+    df_view = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
+    #Display the map
+    #st.map(data=df_view, zoom=15)
+    st.map(data=df_view, size = 10 , zoom=15)
 
-        # Assuming the user selects a point on the map or an address is successfully geocoded
-        if latitude and longitude:
-            # Prepare the data for the API call
-            data = {
-                "living_area": living_area,
-                "latitude": latitude,
-                "longitude": longitude
-            }
-            # Call the prediction API
-            predicted_price = call_prediction_api(data)
+    if latitude and longitude:
+            # # Prepare the data for the API call
+            # data = {
+            #     "living_area": living_area,
+            #     "latitude": latitude,
+            #     "longitude": longitude
+            # }
+            # # Call the prediction API
+            # predicted_price = call_prediction_api(data)
+            predicted_price = 100000
+            formatted_price = f"€{predicted_price:,.2f}"
             # Display the predicted price
-            st.markdown(f"**Predicted Price: ${predicted_price}**")
-
-# Display the map for selecting a location
-# This is a simplified example. For actual implementation, consider using st.pydeck_chart or another method to capture clicks.
-if not address:  # Only display the map if no address is entered
-    map_location.map(zoom=4)
+            st.header(f"**Predicted Price: {formatted_price}**")
