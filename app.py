@@ -45,7 +45,7 @@ st.header("Predict house price")
 
 # Form for user input
 with st.form("house_price_form"):
-    living_area = st.number_input("Living area (in square feet)",
+    living_area = st.number_input("Living area (in square meters)",
                                   min_value=1, max_value=10000, value = 100, step=1)
     address = st.text_input("Enter an address (or leave blank to select on map)")
 
@@ -64,6 +64,7 @@ if submitted:
     st.map(data=df_view, size = 10 , zoom=15)
 
     if latitude and longitude:
+            #TODO: Enhance API call based on final model prediction API
             # # Prepare the data for the API call
             # data = {
             #     "living_area": living_area,
