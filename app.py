@@ -26,8 +26,9 @@ def geocode_address(address):
             longitude = data[0]['lon']
             osm_id = data[0]['osm_id']
             osm_type = data[0]['osm_type']
+            address_display_name = data[0]['display_name']
             print("Location found ✅ " + address + " : " + latitude + " " + longitude)
-            return latitude, longitude, osm_id, osm_type
+            return latitude, longitude, osm_id, osm_type, address_display_name
         else:
             return "No results found", "No results found"
     else:
@@ -85,6 +86,17 @@ st.header("Predict house price")
 with st.form("house_price_form"):
     living_area = st.number_input("Living area (in square meters)",
                                   min_value=1, max_value=10000, value = 100, step=1)
+    number_of_rooms = st.number_input("Number of rooms", min_value=1, max_value=100, value = 3)
+    property_type_selected = st.radio(
+        "What is the type of your property?",
+        ["Appartment 🏢", "House 🏡"]
+    )
+    built_status = st.radio(
+        "What is the type of your property?",
+        ["Built ✅", "Off-Plan 🚧"],
+        captions = ["Appartment / house exists.", "You buy it before it is built, when only the plans for it exist."]
+    )
+
     address = st.text_input("Enter an address (or leave blank to select on map)")
 
     #load map - default view is not possible with st.map
@@ -92,18 +104,29 @@ with st.form("house_price_form"):
     submitted = st.form_submit_button("Predict Price")
 
 if submitted:
-    latitude, longitude, osm_id, osm_type = geocode_address(address)
+    latitude, longitude, osm_id, osm_type, address_display_name = geocode_address(address)
+    #get postal code based on address data
     postal_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
-    #postal_code = float(postal_code) #TODO change if we we data processing
-    property_type = 'appartment' #TODO current default value, change to allow user input
-    built = 'built' #default value, change to allow user input
-    number_of_rooms = 2.0 #default value, change to allow user input
+    postal_code = int(postal_code)
+    #determine poperty type based on user input
+    if property_type_selected == 'Appartment 🏢':
+        property_type = 'appartment'
+    else:
+        property_type = 'house'
+    #determine built status based on user input
+    if built_status == 'Built ✅':
+        built = 'built' #default value
+    else:
+        built = 'off-plan'
+    # Convert number of rooms
+    number_of_rooms = float(number_of_rooms)
     # Convert latitude and longitude to float
     latitude = float(latitude)
     longitude = float(longitude)
     df_view = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
     #Display the map
-    #st.map(data=df_view, zoom=15)
+    extended_address_display = f"**Location 📍**: {address_display_name}"
+    st.markdown(extended_address_display)
     st.map(data=df_view, size = 10 , zoom=15)
 
     if latitude and longitude:
