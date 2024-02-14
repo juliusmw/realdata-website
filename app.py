@@ -6,6 +6,7 @@ import pydeck as pdk
 import pandas as pd
 import streamlit as st
 import json
+from streamlit_extras.let_it_rain import rain
 
 def geocode_address(address):
     """Convert address to latitude and longitude."""
@@ -140,31 +141,50 @@ def generate_gradient_bar(min_price, max_price, predicted_price):
 #start of web-interface design - Documentation: https://docs.streamlit.io/
 
 # Streamlit app layout
-st.header("Predict house price")
+st.header("Predict the price of your dream residency 🏡")
 
 # Form for user input
 with st.form("house_price_form"):
-    living_area = st.number_input("Living area (in square meters)",
-                                  min_value=1, max_value=10000, value = 100, step=1)
-    number_of_rooms = st.number_input("Number of rooms (where you live, eat or sleep)", min_value=1, max_value=100, value = 3)
+
+    address = st.text_input("Enter the address of your favourite location in France")
+
     property_type_selected = st.radio(
         "What is the type of your property?",
         ["Apartment 🏢", "House 🏡"]
     )
+
+    living_area, number_of_rooms, number_of_dependency = st.columns(3)
+
+    with living_area:
+        living_area = st.number_input("Living area",
+                                  min_value=1, max_value=10000, value = 100, step=1,
+                                  help = 'in square meters')
+
+    with number_of_rooms:
+        number_of_rooms = st.number_input("Number of rooms",
+                                          min_value=1, max_value=100, value = 3,
+                                          help = 'Rooms in which you live, eat or sleep')
+
+    with number_of_dependency:
+        number_of_dependency = st.number_input("Number of extensions?",
+                                               min_value=0, max_value=10, value = 0,
+                                               help = 'Separate building such as garage, storage, cellar, etc.')
+
     built_status = st.radio(
         "What is the type of your property?",
         ["Built ✅", "Off-Plan 🚧"],
         captions = ["Apartment / house exists.", "You buy it before it is built, when only the plans for it exist."]
     )
-    number_of_dependency = st.number_input("Do you have a dependency (e.g. garage, cellar, etc.)?", min_value=0, max_value=10, value = 0)
 
-    address = st.text_input("Enter an address (or leave blank to select on map)")
+    submitted = st.form_submit_button("Predict Price", type='primary', use_container_width=True)
 
     #load map - default view is not possible with st.map
     map_location = st.empty()  # Placeholder for the map
-    submitted = st.form_submit_button("Predict Price")
 
 if submitted:
+
+    st.balloons()
+
     latitude, longitude, osm_id, osm_type, address_display_name = geocode_address(address)
     #get postal code based on address data
     postal_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
@@ -188,10 +208,6 @@ if submitted:
     latitude = float(latitude)
     longitude = float(longitude)
     df_view = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
-    #Display the map
-    extended_address_display = f"**Location 📍**: {address_display_name}"
-    st.markdown(extended_address_display)
-    st.map(data=df_view, size = 10 , zoom=15)
 
     if latitude and longitude:
             # Prepare the data for the API call
@@ -207,25 +223,33 @@ if submitted:
             }
             # Call the prediction API
             predicted_price = call_prediction_api(data)
-
+            predicted_price = round(predicted_price, -3)
 
             if predicted_price != "Error calling prediction API":
                 # Calculate and display the predicted price
-                formatted_price = f"€{predicted_price:,.2f}"
+                formatted_price = f"€{predicted_price:,.0f}"
                 st.header(f"**Predicted Price: {formatted_price}**")
 
                 # Calculate and display the price range
-                percentage = 10  # Define the percentage for the range calculation
+                percentage = 20  # Define the percentage for the range calculation
                 # Calculate the price range
                 min_price, max_price = calculate_price_range(predicted_price, percentage)
+                min_price = round(min_price, -3)
+                max_price = round(max_price, -3)
                 #generat the gradient bar
-                gradient_bar_html = generate_gradient_bar(min_price, max_price, predicted_price)
+                gradient_bar_html = generate_gradient_bar(min_pgitgirice, max_price, predicted_price)
                 # Display the gradient bar in Streamlit
                 st.markdown(gradient_bar_html, unsafe_allow_html=True)
                 # You can also display the price range text if you'd like
-                st.write(f"**Price Range:** €{min_price:,.2f} - €{max_price:,.2f}")
+                st.markdown(f"**Price Range:** €{min_price:,.0f} - €{max_price:,.0f}")
+                st.markdown(":gray[*Due to the impact of residency age and state and other factors the price may vary.*]")
                 # formatted_min_price = f"€{min_price:,.2f}"
                 # formatted_max_price = f"€{max_price:,.2f}"
                 #st.write(f"**Price Range:** {formatted_min_price} - {formatted_max_price}")
             else:
                 st.write("There was an error in predicting the price. Please try again.")
+
+    #Display the map
+    extended_address_display = f"**Location 📍**: {address_display_name}"
+    st.markdown(extended_address_display)
+    st.map(data=df_view, size = 10 , zoom=15)
