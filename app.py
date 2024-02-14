@@ -68,9 +68,10 @@ def call_prediction_api(data):
         'built': data['built'],
         'number_of_rooms': data['number_of_rooms'],
         'postal_code': data['postal_code'],
-        'number_of_dependency': data['number_of_dependency']
+        'nb_of_dep': data['number_of_dependency']
     }
     response = requests.get(api_url_local, params=params)
+    print(requests.get(api_url_local, params=params).url)
     if response.status_code == 200:
         data = response.json()
         # Extract the predicted price
