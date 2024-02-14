@@ -237,7 +237,7 @@ if submitted:
                 min_price = round(min_price, -3)
                 max_price = round(max_price, -3)
                 #generat the gradient bar
-                gradient_bar_html = generate_gradient_bar(min_pgitgirice, max_price, predicted_price)
+                gradient_bar_html = generate_gradient_bar(min_price, max_price, predicted_price)
                 # Display the gradient bar in Streamlit
                 st.markdown(gradient_bar_html, unsafe_allow_html=True)
                 # You can also display the price range text if you'd like
