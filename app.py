@@ -71,6 +71,7 @@ def call_prediction_api(data):
         'nb_of_dep': data['number_of_dependency']
     }
     response = requests.get(api_url, params=params)
+    print(response)
     print(requests.get(api_url, params=params).url)
     if response.status_code == 200:
         data = response.json()
