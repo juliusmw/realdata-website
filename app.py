@@ -6,7 +6,6 @@ import pydeck as pdk
 import pandas as pd
 import streamlit as st
 import json
-from streamlit_extras.let_it_rain import rain
 
 def geocode_address(address):
     """Convert address to latitude and longitude."""
@@ -59,8 +58,8 @@ def get_postalcode(osm_id, osm_type):
 def call_prediction_api(data):
     """Placeholder function to call the prediction API."""
     # Replace the URL with the actual API URL
-    #api_url = "http://localhost:8000/predict_price"
-    api_url_local = "http://localhost:8000/predict_price"
+    api_url = "https://propvalueightcloud-jbpstozloq-ew.a.run.app"
+    #api_url_local = "http://localhost:8000/predict_price"
     params = {
         'living_area': data['living_area'],
         'latitude': data['latitude'],
@@ -71,8 +70,8 @@ def call_prediction_api(data):
         'postal_code': data['postal_code'],
         'nb_of_dep': data['number_of_dependency']
     }
-    response = requests.get(api_url_local, params=params)
-    print(requests.get(api_url_local, params=params).url)
+    response = requests.get(api_url, params=params)
+    print(requests.get(api_url, params=params).url)
     if response.status_code == 200:
         data = response.json()
         # Extract the predicted price
