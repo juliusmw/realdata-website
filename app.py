@@ -58,7 +58,7 @@ def get_postalcode(osm_id, osm_type):
 def call_prediction_api(data):
     """Placeholder function to call the prediction API."""
     # Replace the URL with the actual API URL
-    api_url = "https://propvalueightcloud-jbpstozloq-ew.a.run.app"
+    api_url = "https://propvalueightcloud-jbpstozloq-ew.a.run.app/predict_price"
     #api_url_local = "http://localhost:8000/predict_price"
     params = {
         'living_area': data['living_area'],
