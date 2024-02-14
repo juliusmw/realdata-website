@@ -222,7 +222,7 @@ if submitted:
             }
             # Call the prediction API
             predicted_price = call_prediction_api(data)
-            predicted_price = round(predicted_price, -3)
+            #predicted_price = round(predicted_price, -3)
 
             if predicted_price != "Error calling prediction API":
                 # Calculate and display the predicted price
