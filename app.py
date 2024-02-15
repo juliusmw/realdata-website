@@ -270,12 +270,13 @@ if submitted:
                         else:
                             st.write("We don't have enough data to predict the price. Please try another location.")
                     st.success('')
+
+            #Display the map
+            extended_address_display = f"**Location 📍**: {address_display_name}"
+            st.markdown(extended_address_display)
+            st.map(data=df_view, size = 10 , zoom=15)
+
         else:
             st.write('Please provide an address in France.')
-
-        #Display the map
-        extended_address_display = f"**Location 📍**: {address_display_name}"
-        st.markdown(extended_address_display)
-        st.map(data=df_view, size = 10 , zoom=15)
     else:
         st.write('Please provide a valid address.')
