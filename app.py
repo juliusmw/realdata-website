@@ -192,91 +192,95 @@ if submitted:
 
     #get postal code based on address data
     if osm_id != "No results found":
-        postal_code, country_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
+            try:
+            postal_code, country_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
 
-        if country_code == 'fr':
-            postal_code = int(postal_code)
-            #determine poperty type based on user input; apartment is english vs. appartment is french spelling
-            if property_type_selected == 'Apartment 🏢':
-                property_type = 'appartment'
+            if country_code == 'fr':
+                postal_code = int(postal_code)
+                #determine poperty type based on user input; apartment is english vs. appartment is french spelling
+                if property_type_selected == 'Apartment 🏢':
+                    property_type = 'appartment'
+                else:
+                    property_type = 'house'
+                #determine built status based on user input
+                if built_status == 'Built ✅':
+                    built = 'built' #default value
+                else:
+                    built = 'off-plan'
+                # Convert number of rooms
+                number_of_rooms = float(number_of_rooms)
+                # Convert dependency status - TODO: check if this is correct
+                number_of_dependency = int(number_of_dependency)
+
+                # Convert latitude and longitude to float
+                latitude = float(latitude)
+                longitude = float(longitude)
+                df_view = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
+
+                if latitude and longitude:
+                        # Prepare the data for the API call
+                        data = {
+                            "living_area": living_area,
+                            "latitude": latitude,
+                            "longitude": longitude,
+                            "property_type": property_type,
+                            "built": built,
+                            "number_of_rooms": number_of_rooms,
+                            "postal_code": postal_code,
+                            "number_of_dependency": number_of_dependency
+                        }
+
+                        st.markdown("""
+                        <style>
+                        div.stSpinner > div{
+                            text-align:center;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        </style>
+                        """, unsafe_allow_html=True)
+
+                        with st.spinner('Determining your price...'):
+
+                            # Call the prediction API
+                            predicted_price = call_prediction_api(data)
+
+                            if predicted_price != "Error calling prediction API":
+                                #Round number to 10 000
+                                predicted_price = round(predicted_price, -3)
+                                # Calculate and display the predicted price
+                                formatted_price = f"€{predicted_price:,.0f}"
+                                st.header(f"**Predicted Price: {formatted_price}**")
+                                # Calculate and display the price range
+                                percentage = 20  # Define the percentage for the range calculation
+                                # Calculate the price range
+                                min_price, max_price = calculate_price_range(predicted_price, percentage)
+                                min_price = round(min_price, -3)
+                                max_price = round(max_price, -3)
+                                #generat the gradient bar
+                                gradient_bar_html = generate_gradient_bar(min_price, max_price, predicted_price)
+                                # Display the gradient bar in Streamlit
+                                st.markdown(gradient_bar_html, unsafe_allow_html=True)
+                                # You can also display the price range text if you'd like
+                                st.markdown(f"**Price Range:** €{min_price:,.0f} - €{max_price:,.0f}")
+                                st.markdown(":gray[*Due to the impact of residency age and state and other factors the price may vary.*]")
+                                # formatted_min_price = f"€{min_price:,.2f}"
+                                # formatted_max_price = f"€{max_price:,.2f}"
+                                #st.write(f"**Price Range:** {formatted_min_price} - {formatted_max_price}")
+                                st.balloons()
+                            else:
+                                st.write("We don't have enough data to predict the price. Please try another location.")
+                        st.success('')
+
+                #Display the map
+                extended_address_display = f"**Location 📍**: {address_display_name}"
+                st.markdown(extended_address_display)
+                st.map(data=df_view, size = 10 , zoom=15)
+
             else:
-                property_type = 'house'
-            #determine built status based on user input
-            if built_status == 'Built ✅':
-                built = 'built' #default value
-            else:
-                built = 'off-plan'
-            # Convert number of rooms
-            number_of_rooms = float(number_of_rooms)
-            # Convert dependency status - TODO: check if this is correct
-            number_of_dependency = int(number_of_dependency)
+                st.write('Please provide an address in France.')
 
-            # Convert latitude and longitude to float
-            latitude = float(latitude)
-            longitude = float(longitude)
-            df_view = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
-
-            if latitude and longitude:
-                    # Prepare the data for the API call
-                    data = {
-                        "living_area": living_area,
-                        "latitude": latitude,
-                        "longitude": longitude,
-                        "property_type": property_type,
-                        "built": built,
-                        "number_of_rooms": number_of_rooms,
-                        "postal_code": postal_code,
-                        "number_of_dependency": number_of_dependency
-                    }
-
-                    st.markdown("""
-                    <style>
-                    div.stSpinner > div{
-                        text-align:center;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    </style>
-                    """, unsafe_allow_html=True)
-
-                    with st.spinner('Determining your price...'):
-
-                        # Call the prediction API
-                        predicted_price = call_prediction_api(data)
-
-                        if predicted_price != "Error calling prediction API":
-                            #Round number to 10 000
-                            predicted_price = round(predicted_price, -3)
-                            # Calculate and display the predicted price
-                            formatted_price = f"€{predicted_price:,.0f}"
-                            st.header(f"**Predicted Price: {formatted_price}**")
-                            # Calculate and display the price range
-                            percentage = 20  # Define the percentage for the range calculation
-                            # Calculate the price range
-                            min_price, max_price = calculate_price_range(predicted_price, percentage)
-                            min_price = round(min_price, -3)
-                            max_price = round(max_price, -3)
-                            #generat the gradient bar
-                            gradient_bar_html = generate_gradient_bar(min_price, max_price, predicted_price)
-                            # Display the gradient bar in Streamlit
-                            st.markdown(gradient_bar_html, unsafe_allow_html=True)
-                            # You can also display the price range text if you'd like
-                            st.markdown(f"**Price Range:** €{min_price:,.0f} - €{max_price:,.0f}")
-                            st.markdown(":gray[*Due to the impact of residency age and state and other factors the price may vary.*]")
-                            # formatted_min_price = f"€{min_price:,.2f}"
-                            # formatted_max_price = f"€{max_price:,.2f}"
-                            #st.write(f"**Price Range:** {formatted_min_price} - {formatted_max_price}")
-                            st.balloons()
-                        else:
-                            st.write("We don't have enough data to predict the price. Please try another location.")
-                    st.success('')
-
-            #Display the map
-            extended_address_display = f"**Location 📍**: {address_display_name}"
-            st.markdown(extended_address_display)
-            st.map(data=df_view, size = 10 , zoom=15)
-
-        else:
-            st.write('Please provide an address in France.')
+        except:
+            st.write('Try again.')
     else:
         st.write('Please provide a valid address.')
