@@ -247,6 +247,7 @@ if submitted:
                 st.balloons()
             else:
                 st.write("We don't have enough data to predict the price. Please try another location.")
+                st.snow()
 
     #Display the map
     extended_address_display = f"**Location 📍**: {address_display_name}"
