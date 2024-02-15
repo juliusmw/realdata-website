@@ -221,12 +221,15 @@ if submitted:
                     "postal_code": postal_code,
                     "number_of_dependency": number_of_dependency
                 }
+
+                with st.spinner('Determining your price...'):
+
                 # Call the prediction API
                 predicted_price = call_prediction_api(data)
 
                 if predicted_price != "Error calling prediction API":
                     #Round number to 10 000
-                    predicted_price = round(predicted_price, -5)
+                    predicted_price = round(predicted_price, -4)
                     # Calculate and display the predicted price
                     formatted_price = f"€{predicted_price:,.0f}"
                     st.header(f"**Predicted Price: {formatted_price}**")
@@ -250,6 +253,8 @@ if submitted:
                 else:
                     st.write("We don't have enough data to predict the price. Please try another location.")
                     st.snow()
+                st.success('')
+
         #Display the map
         extended_address_display = f"**Location 📍**: {address_display_name}"
         st.markdown(extended_address_display)
