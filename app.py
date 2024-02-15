@@ -30,7 +30,7 @@ def geocode_address(address):
             print("Location found ✅ " + address + " : " + latitude + " " + longitude)
             return latitude, longitude, osm_id, osm_type, address_display_name
         else:
-            return "No results found", "No results found"
+            return "No results found", "No results found", "No results found", "No results found", "No results found"
     else:
         return "Request failed", "Request failed"
 
@@ -184,9 +184,13 @@ with st.form("house_price_form"):
 if submitted:
 
     latitude, longitude, osm_id, osm_type, address_display_name = geocode_address(address)
+
     #get postal code based on address data
-    postal_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
-    postal_code = int(postal_code)
+    if osm_id != "No results found":
+        postal_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
+        postal_code = int(postal_code)
+    else:
+        st.text('Please provide a valid address.')
     #determine poperty type based on user input; apartment is english vs. appartment is french spelling
     if property_type_selected == 'Apartment 🏢':
         property_type = 'appartment'
