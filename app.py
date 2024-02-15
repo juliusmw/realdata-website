@@ -183,8 +183,6 @@ with st.form("house_price_form"):
 
 if submitted:
 
-    st.balloons()
-
     latitude, longitude, osm_id, osm_type, address_display_name = geocode_address(address)
     #get postal code based on address data
     postal_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
@@ -246,8 +244,9 @@ if submitted:
                 # formatted_min_price = f"€{min_price:,.2f}"
                 # formatted_max_price = f"€{max_price:,.2f}"
                 #st.write(f"**Price Range:** {formatted_min_price} - {formatted_max_price}")
+                st.balloons()
             else:
-                st.write("There was an error in predicting the price. Please try again.")
+                st.write("We don't have enough data to predict the price. Please try another location.")
 
     #Display the map
     extended_address_display = f"**Location 📍**: {address_display_name}"
