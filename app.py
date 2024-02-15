@@ -251,7 +251,7 @@ if submitted:
                     st.write("We don't have enough data to predict the price. Please try another location.")
                     st.snow()
     else:
-    st.text('Please provide a valid address.')
+        st.write('Please provide a valid address.')
 
 
     #Display the map
