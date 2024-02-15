@@ -239,7 +239,7 @@ if submitted:
 
                     if predicted_price != "Error calling prediction API":
                         #Round number to 10 000
-                        predicted_price = round(predicted_price, -4)
+                        predicted_price = round(predicted_price, -3)
                         # Calculate and display the predicted price
                         formatted_price = f"€{predicted_price:,.0f}"
                         st.header(f"**Predicted Price: {formatted_price}**")
