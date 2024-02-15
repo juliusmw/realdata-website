@@ -281,6 +281,6 @@ if submitted:
                 st.write('Please provide an address in France.')
 
         except:
-            st.write('Try again.')
+            st.write('Please provide a valid input.')
     else:
         st.write('Please provide a valid address.')
