@@ -46,12 +46,15 @@ def get_postalcode(osm_id, osm_type):
     if response.status_code == 200:
         data = response.json()
         if data:
-            # Country code
+            # Extract country code
             country_code = data['country_code']
             # Extract postal code
-            postal_code = data['calculated_postcode']
-            print("Postal code found ✅: " + postal_code)
-            return postal_code, country_code
+            if 'calculated_postcode' in data:
+                postal_code = data['calculated_postcode']
+                print("Postal code found ✅: " + postal_code)
+                return postal_code, country_code
+            else:
+                return "No results found", country_code
         else:
             return "No results found", "No results found"
     else:
@@ -188,14 +191,11 @@ if submitted:
     latitude, longitude, osm_id, osm_type, address_display_name = geocode_address(address)
 
     #get postal code based on address data
-
     if osm_id != "No results found":
         postal_code, country_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
 
         if country_code == 'fr':
-
             postal_code = int(postal_code)
-
             #determine poperty type based on user input; apartment is english vs. appartment is french spelling
             if property_type_selected == 'Apartment 🏢':
                 property_type = 'appartment'
