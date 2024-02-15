@@ -192,7 +192,7 @@ if submitted:
 
     #get postal code based on address data
     if osm_id != "No results found":
-            try:
+        try:
             postal_code, country_code = get_postalcode(osm_id = osm_id, osm_type= osm_type)
 
             if country_code == 'fr':
