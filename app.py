@@ -222,6 +222,16 @@ if submitted:
                     "number_of_dependency": number_of_dependency
                 }
 
+                st.markdown("""
+                <style>
+                div.stSpinner > div{
+                    text-align:center;
+                    align-items: center;
+                    justify-content: center;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
                 with st.spinner('Determining your price...'):
 
                     # Call the prediction API
