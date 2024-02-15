@@ -221,13 +221,12 @@ if submitted:
             }
             # Call the prediction API
             predicted_price = call_prediction_api(data)
-            #predicted_price = round(predicted_price, -3)
+            predicted_price = round(predicted_price, -3)
 
             if predicted_price != "Error calling prediction API":
                 # Calculate and display the predicted price
                 formatted_price = f"€{predicted_price:,.0f}"
                 st.header(f"**Predicted Price: {formatted_price}**")
-
                 # Calculate and display the price range
                 percentage = 20  # Define the percentage for the range calculation
                 # Calculate the price range
