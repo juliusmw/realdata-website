@@ -171,7 +171,7 @@ with st.form("house_price_form"):
                                           help = 'Rooms in which you live, eat or sleep')
 
     with number_of_dependency:
-        number_of_dependency = st.number_input("Number of extensions?",
+        number_of_dependency = st.number_input("Number of extensions",
                                                min_value=0, max_value=10, value = 0,
                                                help = 'Separate building such as garage, storage, cellar, etc.')
 
