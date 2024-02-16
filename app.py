@@ -146,7 +146,7 @@ def generate_gradient_bar(min_price, max_price, predicted_price):
 #start of web-interface design - Documentation: https://docs.streamlit.io/
 
 # Streamlit app layout
-st.header("Predict the price of your dream residency 🏡")
+st.header("Predict the price of your dream residence 🏡")
 
 # Form for user input
 with st.form("house_price_form"):
@@ -263,7 +263,7 @@ if submitted:
                                 st.markdown(gradient_bar_html, unsafe_allow_html=True)
                                 # You can also display the price range text if you'd like
                                 st.markdown(f"**Price Range:** €{min_price:,.0f} - €{max_price:,.0f}")
-                                st.markdown(":gray[*Due to the impact of residency age and state and other factors the price may vary.*]")
+                                st.markdown(":gray[*Due to the impact of residence age and state and other factors the price may vary.*]")
                                 # formatted_min_price = f"€{min_price:,.2f}"
                                 # formatted_max_price = f"€{max_price:,.2f}"
                                 #st.write(f"**Price Range:** {formatted_min_price} - {formatted_max_price}")
